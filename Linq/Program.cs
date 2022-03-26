@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,7 +16,7 @@ namespace LinqProject
 
             List<Product> products = new List<Product>
             {
-                new Product{ProductId = 1, CategoryId = 1, ProductName = "Acer Laptop", 
+                new Product{ProductId = 1, CategoryId = 1, ProductName = "Acer Laptop",
                 QuentityPerUnit= "32 GB Ram", UnitPrice = 10000, UnitsInStock=5},
                 new Product{ProductId = 2, CategoryId = 1, ProductName = "Asus Laptop",
                 QuentityPerUnit= "16 GB Ram", UnitPrice = 8000, UnitsInStock=3},
@@ -29,12 +29,92 @@ namespace LinqProject
 
             };
 
+            //Test(products);
+
+            //AnyTest(products);
+
+            //FindTest(products);
+
+            //FindAllTest(products);
+
+            //AscDescTest(products);
+
+            //ClassicLinqTest(products);
+
+            //JoinTest(categories, products);
+
+        }
+
+        private static void JoinTest(List<Category> categories, List<Product> products)
+        {
+            var result = from p in products
+                         join c in categories
+                         on p.CategoryId equals c.CategoryId
+                         where p.UnitPrice > 5000
+                         orderby p.UnitPrice descending
+                         select new ProductDto { ProductId = p.ProductId, CategoryName = c.CategoryName, ProductName = p.ProductName, UnitPrice = p.UnitPrice };
+
+            foreach (var productDto in result)
+            {
+                Console.WriteLine("{0} -- {1}", productDto.ProductName, productDto.CategoryName);
+            }
+        }
+
+        private static void ClassicLinqTest(List<Product> products)
+        {
+            var result = from p in products
+                         where p.UnitPrice > 6000
+                         orderby p.UnitPrice descending,
+                         p.ProductName ascending
+                         select new ProductDto
+                         {
+                             ProductId = p.ProductId,
+                             ProductName = p.ProductName,
+                             UnitPrice = p.UnitPrice
+                         };
+            foreach (var product in result)
+            {
+                Console.WriteLine(product.ProductName);
+            }
+        }
+
+        private static void AscDescTest(List<Product> products)
+        {
+            var result = products.Where(p => p.ProductName.Contains("top")).OrderByDescending(p => p.UnitPrice).ThenByDescending(p => p.ProductName);
+
+            foreach (var product in result)
+            {
+                Console.WriteLine(product.ProductName);
+            }
+        }
+
+        private static void FindAllTest(List<Product> products)
+        {
+            var result = products.FindAll(p => p.ProductName.Contains("top")).OrderBy(p => p.UnitPrice); //Liste döndürür.
+            Console.WriteLine(result);
+        }
+
+        private static void FindTest(List<Product> products)
+        {
+            var result = products.Find(p => p.ProductId == 3);
+            Console.WriteLine(result.ProductName);
+        }
+
+        private static void AnyTest(List<Product> products)
+        {
+            var result = products.Any(p => p.ProductName == "Acer Laptop"); //bool döner.
+            Console.WriteLine(result);
+        }
+
+        private static void Test(List<Product> products)
+        {
             var result = products.Where(p => p.UnitPrice > 5000 && p.UnitsInStock > 3); //array tabanlı
 
             foreach (var product in result)
             {
                 Console.WriteLine(product.ProductName);
             }
+
 
             static List<Product> GetProducts(List<Product> products)
             {
@@ -43,6 +123,13 @@ namespace LinqProject
             }
 
         }
-        
+
+        class ProductDto
+        {
+            public int ProductId { get; set; }
+            public string CategoryName { get; set; }
+            public string ProductName { get; set; }
+            public decimal UnitPrice { get; set; }
+        }
     }
 }
